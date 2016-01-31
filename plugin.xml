@@ -1,44 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="me.rost.myplugin" version="0.0.1">
-    <name>MyPlugin</name>
-    <description>Empty Plugin</description>
-    <keywords></keywords>
+    id="testvteam.pushyplugin"
+    version="0.0.1">
+    <name>Pushy</name>
+    <description>Cordova Plugin for Pushy</description>
+    <keywords>Cordova,Pushy</keywords>
+    <repo>https://github.com/TestVTeam/cordova-pushy-plugin.git</repo>
 
-    <js-module src="www/myplugin.js" name="myplugin">
-        <clobbers target="myplugin" />  <!-- this puts the plugin in window.myplugin -->
+    <js-module src="www/pushyme.js" name="pushyMeTokenID">
+        <clobbers target="window.pushyMeTokenID" />  <!-- this puts the plugin in window.pushyMeTokenID -->
     </js-module>
-
-    <platform name="ios">
-        <config-file target="config.xml" parent="/*">
-            <feature name="MyPlugin">
-                <param name="ios-package" value="CDVMyPlugin"/>
-            </feature>
-        </config-file>
-        <header-file src="src/ios/CDVMyPlugin.h" />
-        <source-file src="src/ios/CDVMyPlugin.m" />
-    </platform>
 
     <!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="MyPlugin" >
-                <param name="android-package" value="me.rost.myplugin.MyPlugin"/>
+            <feature name="CDVPlushyMePlugin">
+                <param name="android-package" value="com.lokesh.CDVpushyMe.plugin.CDVPlushyMePlugin"/>
             </feature>
         </config-file>
 
-        <source-file src="src/android/MyPlugin.java" target-dir="src/me/rost/myplugin/" />
-    </platform>
-
-    <platform name="browser">
-        <config-file target="config.xml" parent="/*">
-            <feature name="MyPlugin">
-                <param name="browser-package" value="MyPlugin" />
-            </feature>
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.WAKE_LOCK" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
         </config-file>
 
-        <js-module src="src/browser/MyPluginProxy.js" name="MyPluginProxy">
-            <runs />
-        </js-module>
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+
+            <!-- Pushy Socket Service -->
+            <!-- Do not modify - internal listener background service -->
+            <service android:name="me.pushy.sdk.services.PushySocketService"/>
+
+            <!-- Pushy Notification Receiver -->
+            <!--  Do not modify (except for package name of PushReceiver ) -->
+
+            <receiver android:name="com.lokesh.CDVpushyMe.plugin.PushReceiver" >
+                <intent-filter>
+                    <action android:name="pushy.me" />
+                </intent-filter>
+            </receiver>
+
+            <!-- Pushy Update Receiver -->
+            <!--  Do not modify (except for package name of path="com.testpushyme") -->
+
+            <receiver android:name="me.pushy.sdk.receivers.PushyUpdateReceiver">
+                <intent-filter>
+                    <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                    <data android:path="$PACKAGE_NAME" android:scheme="package" />
+                </intent-filter>
+            </receiver>
+
+            <!-- Pushy Boot Receiver -->
+            <!-- Do not modify - internal BroadcastReceiver that restarts the listener service -->
+            <receiver android:name="me.pushy.sdk.receivers.PushyBootReceiver" >
+                <intent-filter>
+                    <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                </intent-filter>
+            </receiver>
+        </config-file>
+
+        <source-file src="src/android/CDVPlushyMePlugin.java" target-dir="src/com/lokesh/CDVpushyMe/plugin" />
+        <source-file src="src/android/PushReceiver.java" target-dir="src/com/lokesh/CDVpushyMe/plugin" />
+        <source-file src="src/android/libs/pushy-1.0.7.jar" target-dir="libs/" />
     </platform>
+
+
 </plugin>
